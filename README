@@ -1,0 +1,69 @@
+## Allwinner Kitchen
+
+Handy tools suitable for:
+ * Android **boot.img** splitting
+ * Android **simg2img** convertions
+ * Allwinner **fex2bin** and **bin2fex** utils ([sunxi-tools](https://github.com/linux-sunxi/sunxi-tools))
+
+All binaries are ELF 32-bit LSB executables. Sorry, OS X guys :(
+
+### Repacker utility
+
+This tool will unpack the boot.img from any Android device, but AFAIK repacked imgs will work only for Allwinner SOCs. Test carefully.
+
+**Simple usage:**
+
+* `./repacker.rb <boot.img>` to unpack
+* `./repacker.rb <boot_src>` to pack
+
+Example:
+
+`
+$ ../allwinner-kitchen/repacker.rb boot.img 
+$ ../allwinner-kitchen/repacker.rb boot_src.232/
+$ tree
+.
+├── boot.img
+├── boot_src.232
+│   ├── kernel
+│   └── ramdisk
+│       ├── data
+│       ├── default.prop
+│       ├── dev
+│       ├── init
+│       ├── init.b2g.rc
+│       ├── init.goldfish.rc
+│       ├── initlogo.rle
+│       ├── init.rc
+│       ├── init.sun4i.rc
+│       ├── init.sun4i.usb.rc
+│       ├── proc
+│       ├── sbin
+│       │   ├── adbd
+│       │   └── ueventd -> ../init
+│       ├── sys
+│       ├── system
+│       ├── ueventd.goldfish.rc
+│       ├── ueventd.rc
+│       └── ueventd.sun4i.rc
+└── boot_src.232.img
+
+8 directories, 16 files
+`
+
+### Tools
+
+`
+allwinner-kitchen/tools $ ls
+bin2fex  fex2bin  fexc  make_ext4fs  mkbootfs  mkbootimg  mkuserimg.sh  simg2img  split_bootimg.pl
+`
+
+#### simg2img conversion example
+
+`
+$ allwinner-kitchen/tools/simg2img system.img system_new.img
+$ file system.img 
+system.img: data
+$ file system_new.img 
+system_new.img: Linux rev 1.0 ext4 filesystem data, UUID=57f8f4bc-abf4-655f-bf67-946fc0f9f25b (extents) (large files)
+`
