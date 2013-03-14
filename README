@@ -11,10 +11,10 @@ All binaries are ELF 32-bit LSB executables. Sorry, OS X guys :(
 
 This tool will unpack the boot.img from any Android device, but AFAIK repacked imgs will work only for Allwinner SOCs. Test carefully.
 
-**Simple usage:**
+Simple usage:
 
-* **./repacker.rb <boot.img>** to unpack
-* **./repacker.rb <boot_src>** to pack
+* `./repacker.rb <boot.img>` to unpack
+* `./repacker.rb <boot_src>` to pack
 
 Example:
 
@@ -58,7 +58,7 @@ allwinner-kitchen/tools $ ls
 bin2fex  fex2bin  fexc  make_ext4fs  mkbootfs  mkbootimg  mkuserimg.sh  simg2img  split_bootimg.pl
 ```
 
-#### simg2img conversion example
+Let's convert system.img to ext4 using the simg2img:
 
 ```
 $ allwinner-kitchen/tools/simg2img system.img system_new.img
