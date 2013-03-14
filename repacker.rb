@@ -30,7 +30,7 @@ KITCHEN = File.dirname(__FILE__)
 TOOLS = KITCHEN + '/tools'
 
 def help
-	puts <<-eof
+    puts <<-eof
 Usage:
     ./repacker.rb <boot.img> to unpack
     ./repacker.rb <boot_src> to pack
@@ -38,68 +38,68 @@ Usage:
 end
 
 if ARGV.count < 1
-	help
+    help
 else
-	filename = File.expand_path ARGV.pop
-	filename_base = File.basename filename
-	type = `file #{filename}`.split(' ').last
+    filename = File.expand_path ARGV.pop
+    filename_base = File.basename filename
+    type = `file #{filename}`.split(' ').last
 
-	case type
+    case type
 
-	# When argument points to .img (raw data)
-	when 'data'
-		dir = "boot_src.#{rand(500)}"
-		FileUtils.rm_rf(dir, :secure => true) if File.exist? dir
-		Dir.mkdir(dir)
-		Dir.mkdir(dir + '/ramdisk')
+    # When argument points to .img (raw data)
+    when 'data'
+        dir = "boot_src.#{rand(500)}"
+        FileUtils.rm_rf(dir, :secure => true) if File.exist? dir
+        Dir.mkdir(dir)
+        Dir.mkdir(dir + '/ramdisk')
 
-		Dir.chdir dir do
-			# Splits boot.img into a kernel and a ramdisk
-			`../#{TOOLS}/split_bootimg.pl #{filename}`
+        Dir.chdir dir do
+            # Splits boot.img into a kernel and a ramdisk
+            `../#{TOOLS}/split_bootimg.pl #{filename}`
 
-			Dir.chdir('ramdisk') do
-				# Unpack the ramdisk
-				`gunzip -c ../ramdisk.gz | cpio -i 2>/dev/null`
+            Dir.chdir('ramdisk') do
+                # Unpack the ramdisk
+                `gunzip -c ../ramdisk.gz | cpio -i 2>/dev/null`
 
-				# Clean volatile
-				File.delete '../ramdisk.gz'
-			end
-		end
+                # Clean volatile
+                File.delete '../ramdisk.gz'
+            end
+        end
 
-	# When argument points to a directory
-	when 'directory'
-		Dir.chdir filename do
+    # When argument points to a directory
+    when 'directory'
+        Dir.chdir filename do
 
-			# If we have ramdisk directory
-			if File.directory? 'ramdisk'
-				if File.exist? 'kernel'
+            # If we have ramdisk directory
+            if File.directory? 'ramdisk'
+                if File.exist? 'kernel'
 
-					# Pack the ramdisk
-					`../#{TOOLS}/mkbootfs ramdisk | gzip > ramdisk-new.gz`
+                    # Pack the ramdisk
+                    `../#{TOOLS}/mkbootfs ramdisk | gzip > ramdisk-new.gz`
 
-					# Pack the new boot.img
-					system <<-eos
+                    # Pack the new boot.img
+                    system <<-eos
 ../#{TOOLS}/mkbootimg --base 0x40000000 \
 --kernel kernel --ramdisk ramdisk-new.gz \
 --cmdline 'console=ttyS0,115200 rw init=/init loglevel=8' \
 -o ../#{filename_base}.img
-				eos
+                eos
 
-					# Clean volatile
-					File.delete 'ramdisk-new.gz'
-				else
-					puts "kernel not found in #{filename}"
-					exit -1
-				end
-			else
-				puts "ramdisk directory not found in #{filename}"
-				exit -1
-			end
-		end
+                    # Clean volatile
+                    File.delete 'ramdisk-new.gz'
+                else
+                    puts "kernel not found in #{filename}"
+                    exit -1
+                end
+            else
+                puts "ramdisk directory not found in #{filename}"
+                exit -1
+            end
+        end
 
-	# If argument is neither a folder or a file
-	else
-		puts 'Incorrect argument supplied'
-		exit -1
-	end
+    # If argument is neither a folder or a file
+    else
+        puts 'Incorrect argument supplied'
+        exit -1
+    end
 end
