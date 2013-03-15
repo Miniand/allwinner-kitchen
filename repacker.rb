@@ -26,7 +26,7 @@
 
 require 'fileutils'
 
-KITCHEN = File.dirname(__FILE__)
+KITCHEN = File.expand_path(File.dirname(__FILE__))
 TOOLS = KITCHEN + '/tools'
 
 def help
@@ -55,7 +55,7 @@ else
 
         Dir.chdir dir do
             # Splits boot.img into a kernel and a ramdisk
-            `../#{TOOLS}/split_bootimg.pl #{filename}`
+            `#{TOOLS}/split_bootimg.pl #{filename}`
 
             Dir.chdir('ramdisk') do
                 # Unpack the ramdisk
@@ -75,11 +75,11 @@ else
                 if File.exist? 'kernel'
 
                     # Pack the ramdisk
-                    `../#{TOOLS}/mkbootfs ramdisk | gzip > ramdisk-new.gz`
+                    `#{TOOLS}/mkbootfs ramdisk | gzip > ramdisk-new.gz`
 
                     # Pack the new boot.img
                     system <<-eos
-../#{TOOLS}/mkbootimg --base 0x40000000 \
+#{TOOLS}/mkbootimg --base 0x40000000 \
 --kernel kernel --ramdisk ramdisk-new.gz \
 --cmdline 'console=ttyS0,115200 rw init=/init loglevel=8' \
 -o ../#{filename_base}.img
